@@ -9,13 +9,13 @@ class Website(Base):
     title = Column(String)
     domain = Column(String)
     pages_count = Column(Integer)
-    HTML_ver = Column(String)
+    html_ver = Column(String)
 
     def __str__(self):
         msg = "id({}), url({}), title({}), domain({}), "
-        msg += "pages_count({}), HTML_ver({})"
+        msg += "pages_count({}), html_ver({})"
         return msg.format(self.id, self.url, self.title, self.domain,
-                          self.pages_count, self.HTML_ver)
+                          self.pages_count, self.html_ver)
 
     def __repr__(self):
         return self.__str__()

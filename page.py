@@ -14,7 +14,7 @@ class Page(Base):
     multilang = Column(Integer)
     points = Column(Integer)
 
-    website = Column(Integer, ForeignKey("website.id"))
+    website_id = Column(Integer, ForeignKey("website.id"))
     website = relationship("Website", backref="pages")
 
     def __str__(self):

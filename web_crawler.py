@@ -2,12 +2,21 @@ import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 
+from sqlalchemy.orm import Session
+from connection import Base
+from connection import engine
+from page import Page
+from website import Website
+
 
 class WebCrawler:
 
     def __init__(self, domain):
         self.domain = domain
         self.scanned_urls = []
+
+        Base.metadata.create_all(engine)
+        self.session = Session(bind=engine)
 
     def is_outgoing(self, url):
         if self.domain not in url:
@@ -39,6 +48,8 @@ class WebCrawler:
         r = requests.get(url)
         soup = BeautifulSoup(r.text)
 
+        self.save_page_db(url, soup)
+
         for link in soup.find_all('a'):
             href = link.get('href')
             new_link = self.prepare_link(url, href)
@@ -47,12 +58,42 @@ class WebCrawler:
 
     def scan_website(self, url):
         url = 'http://' + self.domain
+
+        r = requests.get(url)
+        soup = BeautifulSoup(r.text)
+        self.save_website_db(url, soup)
+
         self.scan_page(url)
+
+    def save_website_db(self, url, soup):
+        args = {
+            "url": url,
+            "title": "null",        # unhandled
+            "domain": self.domain,
+            "pages_count": -1,      # unhandled
+            "html_ver": "null"      # unhandled
+        }
+        self.session.add(Website(**args))
+        self.session.commit()
+
+    def save_page_db(self, url, soup):
+        args = {
+            "url": url,
+            "title": "null",
+            "desc": "null",
+            "ads": -1,          # unhandled
+            "SSL": False,       # unhandled
+            "multilang": -1,    # unhandled
+            "points": -1,       # unhandled
+            "website_id": 1
+        }
+        self.session.add(Page(**args))
+        self.session.commit()
 
 
 def main():
-    crawler = WebCrawler("hackbulgaria.com")
-    crawler.scan_website("http://hackbulgaria.com/")
+    crawler = WebCrawler("syndbg.github.io")
+    crawler.scan_website("http://blog.syndbg.com/")
 
 
 if __name__ == '__main__':
