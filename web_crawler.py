@@ -79,8 +79,8 @@ class WebCrawler:
     def save_page_db(self, url, soup):
         args = {
             "url": url,
-            "title": "null",
-            "desc": "null",
+            "title": "null",    # unhandled
+            "desc": "null",     # unhandled
             "ads": -1,          # unhandled
             "SSL": False,       # unhandled
             "multilang": -1,    # unhandled
