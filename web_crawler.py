@@ -92,7 +92,7 @@ class WebCrawler:
             'url': url,
             'title': self.get_page_title(soup),
             'desc': self.get_page_content(soup),
-            'SSL': False,       # unhandled
+            'SSL': self.is_page_ssl(url),       # unhandled
             'multilang': -1,    # unhandled
             'points': -1,       # unhandled
             'website_id': self.CURR_WEBSITE_ID
@@ -125,6 +125,13 @@ class WebCrawler:
         else:
             return desc['content']
 
+    def is_page_ssl(self, url):
+        try:
+            req = requests.get(url, verify=True)
+        except Exception:
+            return False
+        return True if req.status_code == 200 else False
+
     def is_html_5(self, soup):
         html = soup.prettify()
         if html.find('<!DOCTYPE doctype html>') != -1 or \
@@ -134,12 +141,14 @@ class WebCrawler:
 
 
 def main():
-    #crawler = WebCrawler('syndbg.github.io')
-    #crawler.scan_website('http://blog.syndbg.com/')
+    crawler = WebCrawler('syndbg.github.io')
+    crawler.scan_website('http://blog.syndbg.com/')
     #crawler = WebCrawler('hackbulgaria.com')
     #crawler.scan_website('http://hackbulgaria.com/')
-    crawler = WebCrawler('blog.hackbulgaria.com')
-    crawler.scan_website('http://blog.hackbulgaria.com/')
+    #crawler = WebCrawler('blog.hackbulgaria.com')
+    #crawler.scan_website('http://blog.hackbulgaria.com/')
+
+    #print(crawler.is_page_ssl('cifroakt.com'))
 
     # r = requests.get('http://blog.hackbulgaria.com')
     # soup = BeautifulSoup(r.text)
