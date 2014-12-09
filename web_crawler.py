@@ -91,7 +91,7 @@ class WebCrawler:
         args = {
             "url": url,
             "title": self.get_website_title(soup),
-            "desc": "null",     # unhandled
+            "desc": self.get_page_content(soup),
             "ads": -1,          # unhandled
             "SSL": False,       # unhandled
             "multilang": -1,    # unhandled
@@ -114,6 +114,10 @@ class WebCrawler:
         title = soup.title
         return "null" if title is None else title.string
 
+    def get_page_content(self, soup):
+        desc = soup.find("meta", {"property": "og:description"})
+        return "null" if desc is None else desc['content']
+
     def is_html_5(self, soup):
         html = soup.prettify()
         if html.find("<!DOCTYPE doctype html>") != -1 or \
@@ -125,15 +129,15 @@ class WebCrawler:
 def main():
     #crawler = WebCrawler("syndbg.github.io")
     #crawler.scan_website("http://blog.syndbg.com/")
-    crawler = WebCrawler("hackbulgaria.com")
-    crawler.scan_website("http://hackbulgaria.com/")
+    #crawler = WebCrawler("hackbulgaria.com")
+    #crawler.scan_website("http://hackbulgaria.com/")
 
-    #crawler = WebCrawler("blog.hackbulgaria.com")
+    crawler = WebCrawler("blog.hackbulgaria.com")
     #crawler.scan_website("http://blog.hackbulgaria.com/")
 
-    #r = requests.get("http://blog.hackbulgaria.com/")
-    #soup = BeautifulSoup(r.text)
-    #print(crawler.is_html_5(soup))
+    r = requests.get("http://blog.hackbulgaria.com/")
+    soup = BeautifulSoup(r.text)
+    print(crawler.get_page_content(soup))
 
 if __name__ == '__main__':
     main()
