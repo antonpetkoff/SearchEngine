@@ -24,12 +24,12 @@ class WebCrawler:
         if self.domain not in url:
             return True
 
-        if url.startswith("https://", 0, 8):
+        if url.startswith('https://', 0, 8):
             url = url[8:]
         else:
             url = url[7:]       # http://
 
-        if url.startswith("www."):
+        if url.startswith('www.'):
             url = url[4:]
 
         if url.startswith(self.domain) and '#' not in url:
@@ -78,25 +78,25 @@ class WebCrawler:
 
     def save_website_db(self, url, soup, pages_count):
         args = {
-            "url": url,
-            "title": self.get_website_title(soup),
-            "domain": self.domain,
-            "pages_count": pages_count,
-            "html_5": self.is_html_5(soup)
+            'url': url,
+            'title': self.get_page_title(soup),
+            'domain': self.domain,
+            'pages_count': pages_count,
+            'html_5': self.is_html_5(soup)
         }
         self.session.add(Website(**args))
         self.session.commit()
 
     def save_page_db(self, url, soup):
         args = {
-            "url": url,
-            "title": self.get_website_title(soup),
-            "desc": self.get_page_content(soup),
-            "ads": -1,          # unhandled
-            "SSL": False,       # unhandled
-            "multilang": -1,    # unhandled
-            "points": -1,       # unhandled
-            "website_id": self.CURR_WEBSITE_ID
+            'url': url,
+            'title': self.get_page_title(soup),
+            'desc': self.get_page_content(soup),
+            'ads': -1,          # unhandled
+            'SSL': False,       # unhandled
+            'multilang': -1,    # unhandled
+            'points': -1,       # unhandled
+            'website_id': self.CURR_WEBSITE_ID
         }
         self.session.add(Page(**args))
         self.session.commit()
@@ -110,34 +110,41 @@ class WebCrawler:
             filter(Website.domain == domain).all()
         return True if len(result) > 0 else False
 
-    def get_website_title(self, soup):
-        title = soup.title
-        return "null" if title is None else title.string
+    def get_page_title(self, soup):
+        title = soup.find('meta', {'property': 'og:title'})
+        if title is None:
+            title = soup.title
+            return '' if title is None else title.string
+        else:
+            return title['content']
 
     def get_page_content(self, soup):
-        desc = soup.find("meta", {"property": "og:description"})
-        return "null" if desc is None else desc['content']
+        desc = soup.find('meta', {'property': 'og:description'})
+        if desc is None:
+            desc = soup.find('meta', {'name': 'description'})
+            return '' if desc is None else desc['content']
+        else:
+            return desc['content']
 
     def is_html_5(self, soup):
         html = soup.prettify()
-        if html.find("<!DOCTYPE doctype html>") != -1 or \
-           html.find("<!DOCTYPE html>") != -1:
+        if html.find('<!DOCTYPE doctype html>') != -1 or \
+           html.find('<!DOCTYPE html>') != -1:
             return True
         return False
 
 
 def main():
-    #crawler = WebCrawler("syndbg.github.io")
-    #crawler.scan_website("http://blog.syndbg.com/")
-    #crawler = WebCrawler("hackbulgaria.com")
-    #crawler.scan_website("http://hackbulgaria.com/")
+    #crawler = WebCrawler('syndbg.github.io')
+    #crawler.scan_website('http://blog.syndbg.com/')
+    #crawler = WebCrawler('hackbulgaria.com')
+    #crawler.scan_website('http://hackbulgaria.com/')
+    crawler = WebCrawler('blog.hackbulgaria.com')
+    crawler.scan_website('http://blog.hackbulgaria.com/')
 
-    crawler = WebCrawler("blog.hackbulgaria.com")
-    #crawler.scan_website("http://blog.hackbulgaria.com/")
-
-    r = requests.get("http://blog.hackbulgaria.com/")
-    soup = BeautifulSoup(r.text)
-    print(crawler.get_page_content(soup))
+    # r = requests.get('http://blog.hackbulgaria.com')
+    # soup = BeautifulSoup(r.text)
+    # print(crawler.get_page_title(soup))
 
 if __name__ == '__main__':
     main()
