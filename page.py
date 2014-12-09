@@ -9,7 +9,6 @@ class Page(Base):
     url = Column(String)
     title = Column(String)
     desc = Column(String)
-    ads = Column(Integer)
     SSL = Column(Boolean)
     multilang = Column(Integer)
     points = Column(Integer)
@@ -18,10 +17,10 @@ class Page(Base):
     website = relationship("Website", backref="pages")
 
     def __str__(self):
-        msg = "id({}), url({}), title({}), desc({}), ads({}), "
+        msg = "id({}), url({}), title({}), desc({}), "
         msg += "SSL({}), multilang({}), points({})"
         return msg.format(self.id, self.url, self.title, self.desc,
-                          self.ads, self.SSL, self.multilang. self.points)
+                          self.SSL, self.multilang. self.points)
 
     def __repr__(self):
         return self.__str__()

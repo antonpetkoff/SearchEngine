@@ -92,7 +92,6 @@ class WebCrawler:
             'url': url,
             'title': self.get_page_title(soup),
             'desc': self.get_page_content(soup),
-            'ads': -1,          # unhandled
             'SSL': False,       # unhandled
             'multilang': -1,    # unhandled
             'points': -1,       # unhandled
