@@ -11,16 +11,16 @@ class Page(Base):
     desc = Column(String)
     SSL = Column(Boolean)
     multilang = Column(Integer)
-    points = Column(Integer)
+    score = Column(Integer)
 
     website_id = Column(Integer, ForeignKey("website.id"))
     website = relationship("Website", backref="pages")
 
     def __str__(self):
-        msg = "id({}), url({}), title({}), desc({}), "
-        msg += "SSL({}), multilang({}), points({})"
-        return msg.format(self.id, self.url, self.title, self.desc,
-                          self.SSL, self.multilang. self.points)
+        msg = "id({}), url({}), title({}), desc({})"
+        #msg += "SSL({}), multilang({}), score({})"
+        return msg.format(self.id, self.url, self.title, self.desc)
+        #self.SSL, self.multilang. self.score)
 
     def __repr__(self):
         return self.__str__()

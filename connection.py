@@ -3,4 +3,4 @@ from sqlalchemy import create_engine
 
 
 Base = declarative_base()
-engine = create_engine("sqlite:///web.db")
+engine = create_engine("sqlite:///crawled_web.db")

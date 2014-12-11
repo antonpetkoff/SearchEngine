@@ -1,0 +1,23 @@
+<html>
+    <head>
+        <title>Search Results</title>
+        <style type="text/css">
+            body {
+                background: #999999;
+            }
+
+            #search-results {
+                text-align: left;
+            }
+        </style>
+    </head>
+
+    <body>
+        <h1>Search Results</h1>
+        <ul>
+            {% for elem in data %}
+                <li><a href="{{ elem }}">{{ elem }}</a></li>
+            {% endfor %}
+        </ul>
+    </body>
+</html>
