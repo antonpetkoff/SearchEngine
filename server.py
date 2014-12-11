@@ -9,8 +9,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def index():
-    html = open('index.html', 'r').read()
-    return html
+    return render_template('index.html')
 
 
 @app.route('/search/')
@@ -25,4 +24,4 @@ def do_something():
 
 
 if __name__ == '__main__':
-    app.run(degug=debug_mode)
+    app.run(debug=debug_mode)
