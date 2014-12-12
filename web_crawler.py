@@ -96,6 +96,7 @@ class WebCrawler:
             'title': self.get_page_title(soup),
             'desc': self.get_page_description(soup),
             'lines_count': self.count_lines(soup),
+            'images_count': self.count_images(soup),
             'score': 0,
             'website_id': self.CURR_WEBSITE_ID
         }
@@ -149,6 +150,9 @@ class WebCrawler:
         lines = [line for line in text.splitlines() if len(line.strip()) > 1]
         return len(lines)
 
+    def count_images(self, soup):
+        return len(soup(['img']))
+
     def assess_page(self, page):
         score = 0
         if page.title != '':
@@ -159,6 +163,7 @@ class WebCrawler:
             score += 10
         score += 5 * (page.website.pages_count // 50)
         score += 5 * (page.lines_count // 50)
+        score += 2 * page.images_count
 
         return score
 
@@ -181,7 +186,7 @@ def main():
 
     # r = requests.get('http://en.wikipedia.org/wiki/Henry_II_of_England')
     # soup = BeautifulSoup(r.text)
-    # print(crawler.count_lines(soup))
+    # print(len(soup(['img'])))
 
 if __name__ == '__main__':
     main()
