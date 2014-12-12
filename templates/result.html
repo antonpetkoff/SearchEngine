@@ -3,21 +3,51 @@
         <title>Search Results</title>
         <style type="text/css">
             body {
-                background: #999999;
+                background: #FFFF99;
+                font-family: Arial, Sans-Serif, Verdana;
+                font-style: normal;
             }
 
-            #search-results {
-                text-align: left;
+            a {
+                text-decoration: none;
+            }
+
+            p {
+                margin: 0;
+            }
+
+            #main_block {
+                margin-left: 50px;
+            }
+
+            #result {
+                margin-bottom: 20px
+            }
+
+            p.heading {
+                font-size: 20px;
             }
         </style>
     </head>
 
     <body>
         <h1>Search Results</h1>
-        <ul>
-            {% for elem in data %}
-                <li><a href="{{ elem }}">{{ elem }}</a></li>
-            {% endfor %}
-        </ul>
+        <hr/>
+
+        <div id="main_block">
+            {% if data %}
+                {% for elem in data %}
+                <div id="result">
+                    <p class="heading"><a href="{{ elem.url }}">{{ elem.title }}</a></p>
+                    <p>{{ elem.url }}</p>
+                    {% if elem.desc %}
+                        <p>{{ elem.desc }}</p>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            {% else %}
+                <h1>No results...</h1>
+            {% endif %}
+        </div>
     </body>
 </html>

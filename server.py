@@ -17,10 +17,9 @@ def do_something():
     query = request.args.get('query', '')
     se = SearchEngine()
     results = se.make_query(query)
-    data = [str(x) for x in results]
-    print(data)
+    #data = [str(x) for x in results]
 
-    return render_template('result.html', data=data)
+    return render_template('result.html', data=results)
 
 
 if __name__ == '__main__':
