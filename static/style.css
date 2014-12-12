@@ -1,0 +1,33 @@
+body {
+    background: #FFFF99;
+    font-family: Arial, Sans-Serif, Verdana;
+    font-style: normal;
+}
+
+a {
+    text-decoration: none;
+}
+
+p {
+    margin: 2px;
+}
+
+#search-field {
+    text-align: center;
+}
+
+#main_block {
+    margin-left: 50px;
+}
+
+#result {
+    margin-bottom: 25px;
+}
+
+p.heading {
+    font-size: 20px;
+}
+
+p.link {
+    color: #006600;
+}
