@@ -13,7 +13,7 @@
             }
 
             p {
-                margin: 0;
+                margin: 2px;
             }
 
             #main_block {
@@ -21,11 +21,15 @@
             }
 
             #result {
-                margin-bottom: 20px
+                margin-bottom: 25px;
             }
 
             p.heading {
                 font-size: 20px;
+            }
+
+            p.link {
+                color: #006600;
             }
         </style>
     </head>
@@ -39,7 +43,7 @@
                 {% for elem in data %}
                 <div id="result">
                     <p class="heading"><a href="{{ elem.url }}">{{ elem.title }}</a></p>
-                    <p>{{ elem.url }}</p>
+                    <p class="link">{{ elem.url }}</p>
                     {% if elem.desc %}
                         <p>{{ elem.desc }}</p>
                     {% endif %}
