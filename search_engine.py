@@ -12,7 +12,8 @@ class SearchEngine:
 
     def make_query(self, query):
         results = self.session.query(Page).\
-            filter(Page.title.contains(query)).all()
+            filter(Page.title.like('%' + query + '%')).\
+            order_by(Page.score.desc()).all()
         return results
 
 

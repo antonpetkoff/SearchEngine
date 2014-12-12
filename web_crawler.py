@@ -77,7 +77,7 @@ class WebCrawler:
         r = requests.get(url)
         soup = BeautifulSoup(r.text)
         self.save_website_db(url, soup, pages_count)
-        self.assign_scores(self.CURR_WEBSITE_ID)
+        self.assign_scores_to_website_pages(self.CURR_WEBSITE_ID)
 
     def save_website_db(self, url, soup, pages_count):
         args = {
@@ -153,7 +153,7 @@ class WebCrawler:
     def count_images(self, soup):
         return len(soup(['img']))
 
-    def assess_page(self, page):
+    def calculate_page_score(self, page):
         score = 0
         if page.title != '':
             score += 10
@@ -161,17 +161,17 @@ class WebCrawler:
             score += 10
         if page.website.is_html_5:
             score += 10
-        score += 5 * (page.website.pages_count // 50)
+        score += 4 * (page.website.pages_count // 50)
         score += 5 * (page.lines_count // 50)
         score += 2 * page.images_count
 
         return score
 
-    def assign_scores(self, id):
+    def assign_scores_to_website_pages(self, id):
         pages = self.session.query(Page).filter(Page.website_id == id).all()
 
         for page in pages:
-            page.score = self.assess_page(page)
+            page.score = self.calculate_page_score(page)
 
         self.session.commit()
 
@@ -179,10 +179,10 @@ class WebCrawler:
 def main():
     crawler = WebCrawler('syndbg.github.io')
     crawler.scan_website('http://blog.syndbg.com/')
-    #crawler = WebCrawler('hackbulgaria.com')
-    #crawler.scan_website('http://hackbulgaria.com/')
-    #crawler = WebCrawler('blog.hackbulgaria.com')
-    #crawler.scan_website('http://blog.hackbulgaria.com/')
+    # crawler = WebCrawler('hackbulgaria.com')
+    # crawler.scan_website('http://hackbulgaria.com/')
+    # crawler = WebCrawler('blog.hackbulgaria.com')
+    # crawler.scan_website('http://blog.hackbulgaria.com/')
 
     # r = requests.get('http://en.wikipedia.org/wiki/Henry_II_of_England')
     # soup = BeautifulSoup(r.text)
