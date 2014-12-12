@@ -48,6 +48,8 @@ class WebCrawler:
         self.scanned_urls.append(url)
 
         r = requests.get(url)
+        if r.status_code != 200:
+            return
         soup = BeautifulSoup(r.text)
 
         self.save_page_db(url, soup)
@@ -75,6 +77,7 @@ class WebCrawler:
         r = requests.get(url)
         soup = BeautifulSoup(r.text)
         self.save_website_db(url, soup, pages_count)
+        self.assign_scores(self.CURR_WEBSITE_ID)
 
     def save_website_db(self, url, soup, pages_count):
         args = {
@@ -82,7 +85,7 @@ class WebCrawler:
             'title': self.get_page_title(soup),
             'domain': self.domain,
             'pages_count': pages_count,
-            'html_5': self.is_html_5(soup)
+            'is_html_5': self.is_html_5(soup)
         }
         self.session.add(Website(**args))
         self.session.commit()
@@ -91,8 +94,9 @@ class WebCrawler:
         args = {
             'url': url,
             'title': self.get_page_title(soup),
-            'desc': self.get_page_content(soup),
-            'score': -1,       # unhandled
+            'desc': self.get_page_description(soup),
+            'lines_count': self.count_lines(soup),
+            'score': 0,
             'website_id': self.CURR_WEBSITE_ID
         }
         self.session.add(Page(**args))
@@ -115,7 +119,7 @@ class WebCrawler:
         else:
             return title['content']
 
-    def get_page_content(self, soup):
+    def get_page_description(self, soup):
         desc = soup.find('meta', {'property': 'og:description'})
         if desc is None:
             desc = soup.find('meta', {'name': 'description'})
@@ -137,6 +141,35 @@ class WebCrawler:
             return True
         return False
 
+    def count_lines(self, soup):
+        for script in soup(['script', 'style']):
+            script.extract()
+
+        text = soup.get_text()
+        lines = [line for line in text.splitlines() if len(line.strip()) > 1]
+        return len(lines)
+
+    def assess_page(self, page):
+        score = 0
+        if page.title != '':
+            score += 10
+        if page.desc != '':
+            score += 10
+        if page.website.is_html_5:
+            score += 10
+        score += 5 * (page.website.pages_count // 50)
+        score += 5 * (page.lines_count // 50)
+
+        return score
+
+    def assign_scores(self, id):
+        pages = self.session.query(Page).filter(Page.website_id == id).all()
+
+        for page in pages:
+            page.score = self.assess_page(page)
+
+        self.session.commit()
+
 
 def main():
     crawler = WebCrawler('syndbg.github.io')
@@ -146,10 +179,9 @@ def main():
     #crawler = WebCrawler('blog.hackbulgaria.com')
     #crawler.scan_website('http://blog.hackbulgaria.com/')
 
-    # r = requests.get('http://bg.wikipedia.org/')
+    # r = requests.get('http://en.wikipedia.org/wiki/Henry_II_of_England')
     # soup = BeautifulSoup(r.text)
-    # print(soup.text)
-    # print(crawler.count_languages(soup))
+    # print(crawler.count_lines(soup))
 
 if __name__ == '__main__':
     main()
