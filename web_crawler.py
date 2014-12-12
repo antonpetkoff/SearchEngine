@@ -143,6 +143,9 @@ class WebCrawler:
         return False
 
     def count_lines(self, soup):
+        if len(soup('body')) == 0:      # skip files
+            return
+
         for script in soup(['script', 'style']):
             script.extract()
 
@@ -177,16 +180,14 @@ class WebCrawler:
 
 
 def main():
-    crawler = WebCrawler('syndbg.github.io')
-    crawler.scan_website('http://blog.syndbg.com/')
-    # crawler = WebCrawler('hackbulgaria.com')
+    crawler = WebCrawler('hackbulgaria.com')
     # crawler.scan_website('http://hackbulgaria.com/')
-    # crawler = WebCrawler('blog.hackbulgaria.com')
-    # crawler.scan_website('http://blog.hackbulgaria.com/')
 
-    # r = requests.get('http://en.wikipedia.org/wiki/Henry_II_of_England')
+    # r = requests.get('https://wiki.python.org/wiki/europython/img/python-logo.gif')
     # soup = BeautifulSoup(r.text)
-    # print(len(soup(['img'])))
+    # print(soup.get_text())
+    # print(crawler.count_lines(soup))
+
 
 if __name__ == '__main__':
     main()
