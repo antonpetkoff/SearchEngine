@@ -2,7 +2,6 @@ import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 
-from langdetect import detect_langs
 from sqlalchemy.orm import Session
 from connection import Base
 from connection import engine
@@ -93,8 +92,6 @@ class WebCrawler:
             'url': url,
             'title': self.get_page_title(soup),
             'desc': self.get_page_content(soup),
-            'SSL': False,       # unhandled
-            'multilang': -1,    # unhandled
             'score': -1,       # unhandled
             'website_id': self.CURR_WEBSITE_ID
         }
@@ -126,11 +123,7 @@ class WebCrawler:
         else:
             return desc['content']
 
-    def count_languages(self, soup):
-        lang_count = detect_langs(soup.text)
-        return len(lang_count)
-
-    def is_page_ssl(self, url):
+    def is_server_ssl(self, url):
         try:
             req = requests.get(url, verify=True)
         except Exception:
