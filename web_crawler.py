@@ -8,6 +8,8 @@ from connection import engine
 from page import Page
 from website import Website
 
+from queue import Queue
+
 
 class WebCrawler:
     PAGE_COUNTER = 0
@@ -16,6 +18,7 @@ class WebCrawler:
     def __init__(self, domain):
         self.domain = domain
         self.scanned_urls = []
+        self.queue = Queue()
 
         Base.metadata.create_all(engine)
         self.session = Session(bind=engine)
@@ -60,7 +63,16 @@ class WebCrawler:
             href = link.get('href')
             new_link = self.prepare_link(url, href)
             if not self.is_outgoing(new_link):
-                self.scan_page(new_link)
+                self.queue.put(new_link)
+
+    def start_scanning(self, url):
+        self.queue.put(url)
+        print("Start while")
+
+        while not self.queue.empty():
+            temp_url = self.queue.get()
+
+            self.scan_page(temp_url)    # scan, save, increment, fill queue
 
     def scan_website(self, url):
         url = 'http://' + self.domain
@@ -68,14 +80,20 @@ class WebCrawler:
         if self.is_domain_crawled(self.domain):
             return
 
+        r = requests.get(url)
+        if r.status_code != 200:
+            return
+        soup = BeautifulSoup(r.text)
+
+        if self.get_page_title(soup) == '':     # skip pages without name
+            return
+
         self.CURR_WEBSITE_ID = 1 + self.get_last_website_id()
 
-        self.scan_page(url)     # crawl pages to get pages_count
+        self.start_scanning(url)    # crawl pages to get pages_count
         pages_count = self.PAGE_COUNTER
         self.PAGE_COUNTER = 0
 
-        r = requests.get(url)
-        soup = BeautifulSoup(r.text)
         self.save_website_db(url, soup, pages_count)
         self.assign_scores_to_website_pages(self.CURR_WEBSITE_ID)
 
@@ -181,12 +199,7 @@ class WebCrawler:
 
 def main():
     crawler = WebCrawler('hackbulgaria.com')
-    # crawler.scan_website('http://hackbulgaria.com/')
-
-    # r = requests.get('https://wiki.python.org/wiki/europython/img/python-logo.gif')
-    # soup = BeautifulSoup(r.text)
-    # print(soup.get_text())
-    # print(crawler.count_lines(soup))
+    crawler.scan_website('http://hackbulgaria.com/')
 
 
 if __name__ == '__main__':
